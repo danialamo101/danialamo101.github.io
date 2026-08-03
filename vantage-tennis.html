@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vantage Tennis Case Study</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Rock+Salt&display=swap" rel="stylesheet">
@@ -199,6 +200,8 @@
     z-index: 1;
     width: 100%;
     max-width: 560px;
+    aspect-ratio: 956/960;
+    object-fit: cover;
     display: block;
     margin: 0 auto;
     border-radius: 12px;
@@ -275,6 +278,9 @@
   }
 
   .dev-subhead { font-size: 19px !important; font-weight: 700 !important; color: var(--navy) !important; }
+
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
 
 
   .flow-list { display: flex; flex-direction: column; gap: 44px; margin-top: 32px; }
@@ -612,6 +618,11 @@
     .discovery-collage { position: static; max-width: 100%; justify-content: center; margin-top: 24px; }
     .feature-row { min-height: 0; position: static; border-radius: 20px; margin-bottom: 20px; }
     .feature-row-inner { padding: 40px 28px; }
+
+    html { scroll-snap-type: y proximity; }
+    .hero, .sec-overview, .sec-process, .sec-features, .sec-challenges, .sec-reflection, .cta {
+      scroll-snap-align: start;
+    }
   }
 </style>
 </head>
@@ -1066,6 +1077,27 @@
         });
       }, { threshold: 0.4 });
       io.observe(grid);
+    })();
+
+    // Mobile scroll-reveal: since the sticky overlay/stacking effects are
+    // disabled on mobile (too risky on short viewports), give mobile visitors
+    // some sense of motion by fading + sliding content in as it scrolls into
+    // view, rather than everything just sitting there fully rendered at once.
+    (function () {
+      if (window.innerWidth > 800) return;
+      var targets = document.querySelectorAll(
+        '.phase-block, .challenge-card, .feature-row, .tech-card, .overview-grid > div, .research-grid > div'
+      );
+      targets.forEach(function (el) { el.classList.add('reveal'); });
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      targets.forEach(function (el) { io.observe(el); });
     })();
 
     // Flow diagrams: click to open in a fullscreen lightbox

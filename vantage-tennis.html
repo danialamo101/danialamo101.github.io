@@ -617,12 +617,19 @@
     .device-frame.sm { width: 98px; height: 201px; margin-bottom: 46px; }
     .discovery-collage { position: static; max-width: 100%; justify-content: center; margin-top: 24px; }
     .feature-row { min-height: 0; position: static; border-radius: 20px; margin-bottom: 20px; }
-    .feature-row-inner { padding: 40px 28px; }
+    .feature-row-inner { padding: 32px 24px; }
 
-    html { scroll-snap-type: y proximity; }
-    .hero, .sec-overview, .sec-process, .sec-features, .sec-challenges, .sec-reflection, .cta {
-      scroll-snap-align: start;
-    }
+    /* Mobile: normal document flow, no overlay/sticky effects at all --
+       those are a desktop-scale interaction and just cause cut-off content
+       and overlap on a short phone viewport. */
+    .stack.pin { position: static; }
+    .features-sticky-header { position: static; }
+    .features-sticky-header::after { display: none; }
+
+    /* Scale the phone mockups down so they read proportionate on a narrow
+       screen instead of dominating it. */
+    .screen-frame { max-width: 200px; }
+    .dual-frame { max-width: 150px; }
   }
 </style>
 </head>

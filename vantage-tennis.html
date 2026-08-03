@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vantage Tennis Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Rock+Salt&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;        /* cream, per your preference over pure white */
+    --ink: #001D3D;       /* darkest navy — primary text + headline color */
+    --navy: #003566;      /* secondary dark — hero + large blocks */
+    --blue: #055EC2;      /* accent — tags, borders, small details */
+    --sky: #007AFF;       /* accent — links, hover states */
+    --lime: #A4FF0E;      /* pop accent — used sparingly, highlights only */
+    --line: #DAD4C4;
+    --muted: #4A5A68;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+
+  h1, h2, h3 {
+    font-family: 'Archivo Black', sans-serif;
+    font-weight: 400;
+    color: var(--ink);
+  }
+  .mono { font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.03em; }
+
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 0 0 64px 0;
+  }
+
+  section { padding: 72px 0; }
+  section.tight { padding: 48px 0; }
+
+  /* SECTION STACKING -- each big section scrolls up and over the one before it.
+     Shorter sections pin briefly (position:sticky) for a clean cover-reveal.
+     Long, content-heavy sections (Process, Key Features) still slide up and
+     cover with the same rounded top edge, but aren't pinned -- pinning a
+     section taller than the viewport would freeze it on screen and let the
+     next section cover it before you could ever scroll through its content. */
+  .stack {
+    border-radius: 32px 32px 0 0;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    background: var(--bg);
+  }
+  .stack.pin { position: sticky; top: 0; }
+  .stack.pass { position: relative; }
+  .hero.stack { border-radius: 0; box-shadow: none; z-index: 1; }
+  .sec-overview   { z-index: 2; }
+  .sec-process    { z-index: 3; }
+  .sec-features   { z-index: 4; }
+  .sec-challenges { z-index: 5; }
+  .sec-reflection { z-index: 7; }
+  .cta.stack { z-index: 8; background: var(--navy); }
+
+  /* HERO */
+  .hero { background: var(--ink); color: var(--bg); padding: 90px 0 0 0; overflow: hidden; }
+  .hero-inner { padding-bottom: 56px; }
+  .hero .eyebrow-top {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--lime);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 { color: var(--bg); font-size: 68px; line-height: 1.0; margin-bottom: 16px; }
+  .hero .subhead { font-size: 21px; font-weight: 400; color: #AFC3D6; max-width: 620px; margin-bottom: 44px; }
+
+  .scoreboard { display: flex; flex-wrap: wrap; gap: 40px; border-top: 1px solid #234A66; padding-top: 20px; }
+  .scoreboard .label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--sky); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .scoreboard .value { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 15px; color: var(--bg); }
+
+  .hero-inner { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; justify-content: space-between; }
+  .hero-text { min-width: 0; }
+  .hero-visual { position: relative; }
+  .hero-glow {
+    position: absolute;
+    inset: -60px -40px;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 30% 35%, rgba(164,255,14,0.16), transparent 55%),
+      radial-gradient(circle at 75% 65%, rgba(0,122,255,0.20), transparent 55%);
+    filter: blur(30px);
+  }
+  .hero-devices {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    perspective: 1400px;
+  }
+  .device-frame {
+    flex: 0 0 auto;
+    opacity: 0;
+    transform: translateY(28px);
+    animation: heroRise 0.7s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  .device-frame video, .device-frame img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .device-frame.lg { width: 240px; height: 493px; z-index: 2; animation-delay: 0.15s; }
+  .device-frame.md { width: 190px; height: 390px; margin-bottom: 40px; animation-delay: 0.3s; }
+  .device-frame.sm { width: 158px; height: 324px; margin-bottom: 68px; animation-delay: 0s; }
+
+  .device-frame.lg .device-float { animation: heroFloat 7s ease-in-out infinite; animation-delay: 0.9s; }
+  .device-frame.md .device-float { animation: heroFloat 8.5s ease-in-out infinite; animation-delay: 1.2s; }
+  .device-frame.sm .device-float { animation: heroFloat 6.5s ease-in-out infinite; animation-delay: 0.7s; }
+  .device-float { width: 100%; height: 100%; transform-style: preserve-3d; }
+
+  @keyframes heroRise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes heroFloat {
+    0%, 100% { transform: translateY(0) rotateY(var(--tilt, 0deg)); }
+    50% { transform: translateY(-10px) rotateY(var(--tilt, 0deg)); }
+  }
+  .device-frame.md .device-float { --tilt: -7deg; }
+  .device-frame.sm .device-float { --tilt: 7deg; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .device-frame { opacity: 1; transform: none; animation: none; }
+    .device-float { animation: none !important; }
+  }
+
+
+  /* GENERAL */
+  p { color: #33404C; font-size: 16px; margin-bottom: 16px; }
+  .asset-slot {
+    border: 1px dashed var(--blue);
+    border-radius: 4px; min-height: 200px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    text-align: center; padding: 20px; background: rgba(5,94,194,0.03);
+  }
+  .needs-input {
+    border: 1px dashed var(--lime);
+    background: rgba(164,255,14,0.08);
+    border-radius: 4px; padding: 20px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #556B00;
+  }
+
+  h2 { font-size: 32px; margin-bottom: 28px; line-height: 1.15; }
+  h2 .eyebrow {
+    display: block; font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    color: var(--blue); letter-spacing: 0.12em; margin-bottom: 10px; text-transform: uppercase;
+  }
+
+  .pull-quote {
+    background: #EFEAE0;
+    border-left: 4px solid var(--lime);
+    border-radius: 8px;
+    padding: 36px 44px;
+    font-family: 'Inter', sans-serif;
+    font-size: 28px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: var(--navy);
+    margin: 28px 0;
+    width: 100%;
+  }
+  .pull-quote .hmw-tag {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--blue);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .overview-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 48px; align-items: center; }
+
+  .sec-overview h2 .eyebrow { color: var(--blue); }
+  .sec-overview p b { color: var(--sky); }
+  .overview-video { position: relative; }
+  .overview-glow {
+    position: absolute;
+    inset: -50px -30px;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 25% 30%, rgba(164,255,14,0.22), transparent 55%),
+      radial-gradient(circle at 78% 70%, rgba(0,122,255,0.26), transparent 55%);
+    filter: blur(30px);
+  }
+  .overview-video video {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 560px;
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 24px 48px -12px rgba(0,29,61,0.3);
+  }
+
+  .problem p { font-size: 18px; max-width: 760px; }
+
+  .research-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .research-grid .col h3 { font-size: 16px; color: var(--blue); margin-bottom: 12px; font-family: 'Inter', sans-serif; font-weight: 600; }
+  .research-grid .col p, .research-grid .col li { font-size: 14px; color: #444; }
+  .research-grid ol { padding-left: 18px; }
+  .research-grid li { margin-bottom: 8px; }
+  .research-grid .asset-slot { min-height: 140px; margin-bottom: 16px; }
+
+  .goals-list { list-style: none; }
+  .goals-list li { font-size: 17px; padding: 20px 0; border-bottom: 1px solid var(--line); display: flex; gap: 20px; }
+  .goals-list li:first-child { border-top: 1px solid var(--line); }
+  .goals-list .num { font-family: 'IBM Plex Mono', monospace; color: var(--blue); font-weight: 600; flex-shrink: 0; }
+
+  /* PROCESS: Design Thinking phase blocks */
+  .phase-block { padding: 40px 0; border-bottom: 1px solid var(--line); }
+  .phase-block:last-child { border-bottom: none; }
+  .phase-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; }
+  .phase-num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--lime); background: var(--ink); padding: 4px 10px; border-radius: 3px; }
+  .phase-name { font-family: 'Archivo Black', sans-serif; font-size: 24px; color: var(--navy); }
+  .phase-block .content-row { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .phase-block .asset-slot { min-height: 200px; }
+
+  /* SKETCH -> FIGMA reveal cards */
+  .sketch-to-figma-grid { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 28px; }
+  .stf-card { width: 140px; text-align: center; }
+  .stf-card .frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 393 / 852;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 12px 24px rgba(0,29,61,0.18);
+    cursor: pointer;
+    background: var(--bg);
+  }
+  .stf-card .frame img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .stf-card .frame .sketch { z-index: 2; background: #F7F4EE; object-fit: contain; }
+  .stf-card .frame .figma { z-index: 1; }
+  .stf-card .frame.looping .sketch { animation: sketchFigmaLoop 7s ease-in-out infinite; }
+  @keyframes sketchFigmaLoop {
+    0%, 38% { opacity: 1; }
+    50%, 88% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .stf-card .frame.looping .sketch { animation: none; }
+  }
+  .stf-card .stf-label {
+    display: block;
+    margin-top: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+  .stf-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 18px;
+  }
+
+  .dev-subhead { font-size: 19px !important; font-weight: 700 !important; color: var(--navy) !important; }
+
+
+  .flow-list { display: flex; flex-direction: column; gap: 44px; margin-top: 32px; }
+  .flow-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--navy);
+    margin-bottom: 14px;
+  }
+  .flow-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; margin: 0 -32px; padding: 0 32px; }
+  .flow-scroll::-webkit-scrollbar { height: 5px; }
+  .flow-scroll::-webkit-scrollbar-track { background: transparent; }
+  .flow-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
+  .flow-scroll::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+  .flow-scroll img {
+    height: 420px;
+    width: auto;
+    max-width: none;
+    display: block;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    box-shadow: 0 16px 32px rgba(0,29,61,0.1);
+    cursor: zoom-in;
+    transition: transform 0.2s ease;
+  }
+  .flow-scroll img:hover { transform: scale(1.01); }
+  .flow-lightbox { position: fixed; inset: 0; background: rgba(0,29,61,0.94); z-index: 100; display: none; align-items: center; justify-content: center; }
+  .flow-lightbox.active { display: flex; }
+  .flow-lightbox-scroll { overflow: auto; max-width: 92vw; max-height: 88vh; padding: 16px; }
+  .flow-lightbox-scroll img { height: 80vh; width: auto; display: block; border-radius: 8px; }
+  .flow-lightbox-close { position: absolute; top: 24px; right: 32px; background: none; border: none; color: #fff; font-size: 36px; cursor: pointer; line-height: 1; }
+  @media (max-width: 800px) {
+    .flow-scroll img { height: 220px; }
+    .flow-lightbox-scroll img { height: auto; width: 90vw; }
+  }
+
+  .tech-grid { display: flex; gap: 20px; margin-top: 28px; flex-wrap: wrap; }
+  .tech-card {
+    flex: 1;
+    min-width: 200px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .tech-logo { width: 40px; height: 40px; border-radius: 9px; display: block; margin-bottom: 14px; }
+  .tech-role {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 15px;
+    color: var(--navy);
+    margin-bottom: 4px;
+    line-height: 1.25;
+  }
+  .tech-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sky);
+    margin-bottom: 12px;
+  }
+  .tech-card p { font-size: 13px; color: var(--muted); line-height: 1.5; margin: 0; }
+  @media (max-width: 800px) { .tech-grid { flex-direction: column; } }
+
+  .brand-chip { display: flex; align-items: flex-start; gap: 32px; margin-top: 8px; }
+  .brand-chip-logo { width: 84px; height: auto; flex-shrink: 0; border-radius: 14px; box-shadow: 0 3px 8px rgba(0,29,61,0.18); }
+  .brand-chip-dots { display: flex; flex-direction: column; align-items: flex-start; padding-top: 4px; }
+  .brand-chip-dots .dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,29,61,0.18);
+    transition: transform 0.25s ease;
+    margin-top: -14px;
+  }
+  .brand-chip-dots .dot:first-child { margin-top: 0; }
+  .brand-chip-dots .dot:nth-child(1) { margin-left: 0; }
+  .brand-chip-dots .dot:nth-child(2) { margin-left: 22px; }
+  .brand-chip-dots .dot:nth-child(3) { margin-left: 44px; }
+  .brand-chip-dots .dot:nth-child(4) { margin-left: 66px; }
+  .brand-chip-dots .dot:nth-child(5) { margin-left: 88px; }
+  .brand-chip-dots .dot:hover { transform: translateY(-6px); }
+  .phase-block h4 { font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 600; color: var(--ink); margin: 14px 0 6px 0; }
+  .phase-block ol { padding-left: 18px; margin-bottom: 10px; }
+  .phase-block li { font-size: 14px; color: #444; margin-bottom: 6px; }
+
+  .finding-label {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 16px;
+    color: var(--navy);
+    margin: 18px 0 10px 0;
+  }
+  .finding-cards { display: flex; flex-direction: column; gap: 10px; margin: 0 0 18px 0; }
+  .finding-card {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: #EFEAE0; border-left: 3px solid var(--lime);
+    border-radius: 6px; padding: 14px 16px;
+  }
+  .finding-card .fnum {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600;
+    color: var(--navy); flex-shrink: 0;
+  }
+  .finding-card p { margin: 0; font-size: 14px; color: #333; }
+
+  /* DISCOVERY COLLAGE -- sticky visual companion that stays in view while
+     the Discovery text scrolls past it (classic sticky-sidebar: the collage
+     is shorter than the text column, so it pins then releases cleanly,
+     unlike the full-page section stacking which needed the opposite rule). */
+  .discovery-collage {
+    position: sticky;
+    top: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 16px 14px;
+    max-width: 480px;
+  }
+  .collage-item { transition: transform 0.25s ease; }
+  .collage-item:hover { transform: rotate(0deg) scale(1.06) !important; z-index: 5; position: relative; }
+
+  .collage-item.polaroid {
+    background: #fff;
+    padding: 8px 8px 8px 8px;
+    box-shadow: 0 18px 36px rgba(0,29,61,0.24);
+    width: 100%;
+    max-width: 270px;
+    align-self: flex-start;
+  }
+  .collage-item.polaroid img { width: 100%; height: auto; display: block; }
+  .collage-item.polaroid figcaption {
+    font-family: 'Rock Salt', cursive;
+    text-shadow: 0.6px 0.6px 0 rgba(0,0,0,0.25);
+    font-size: 15px;
+    text-align: center;
+    color: #1a1a1a;
+    margin-top: 4px;
+  }
+
+  .collage-item.screenshot {
+    width: 100%;
+    max-width: 190px;
+    align-self: flex-start;
+  }
+  .collage-item.screenshot img {
+    width: 100%;
+    aspect-ratio: 256 / 480;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    border-radius: 20px;
+    border: 6px solid #fff;
+    box-shadow: 0 18px 36px rgba(0,29,61,0.24);
+  }
+  .collage-item.screenshot figcaption {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .collage-item.note {
+    width: 145px;
+    height: 145px;
+    min-width: 0;
+    overflow-wrap: break-word;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    font-family: 'Rock Salt', cursive;
+    text-shadow: 0.6px 0.6px 0 rgba(0,0,0,0.25);
+    font-size: 14px;
+    line-height: 1.34;
+    color: #1a1a1a;
+    box-shadow: 4px 10px 18px rgba(0,0,0,0.22);
+    background: #FFF48A;
+  }
+
+  .c-a { transform: rotate(-4deg); }
+  .c-c { transform: rotate(3deg); }
+  .c-b { transform: rotate(5deg); }
+  .c-d { transform: rotate(-4deg); }
+  .c-e { transform: rotate(4deg); }
+
+  .sketch-gallery { display: flex; flex-direction: column; gap: 24px; margin-top: 20px; }
+  .sketch-gallery figure { margin: 0; }
+  .sketch-gallery img {
+    width: 100%; height: auto; border-radius: 6px; display: block;
+    border: 1px solid var(--line);
+  }
+  .sketch-gallery figcaption {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted);
+    margin-top: 10px;
+  }
+
+  .goals-band {
+    display: flex;
+    gap: 24px;
+    margin: 28px 0 8px 0;
+  }
+  .goal-cell {
+    flex: 1;
+    border-top: 2px solid var(--blue);
+    padding-top: 14px;
+  }
+  .goal-cell .gnum {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--blue);
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .goal-cell h4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--navy);
+    margin: 0 0 8px 0;
+  }
+  .goal-cell p {
+    color: #444;
+    font-size: 14px;
+    margin: 0;
+  }
+
+  /* KEY FEATURES */
+  .feature-row {
+    position: sticky;
+    top: 106px;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    min-height: calc(100vh - 106px);
+    display: flex;
+    align-items: center;
+    color: var(--bg);
+  }
+  .feature-row-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 48px 52px 105px 52px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .feature-row.reverse .feature-row-inner { direction: rtl; }
+  .feature-row.reverse .feature-row-inner > * { direction: ltr; }
+  .feature-row.f-ink   { background: var(--ink);  z-index: 1; }
+  .feature-row.f-navy  { background: var(--navy); z-index: 2; }
+  .feature-row.f-blue  { background: var(--blue); z-index: 3; }
+  .feature-row.f-sky   { background: var(--sky);  z-index: 4; }
+
+  .features-sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    background: var(--ink);
+    padding: 20px 0 24px 0;
+    box-shadow: none;
+  }
+  .sec-features { box-shadow: none; }
+  .features-sticky-header::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: -28px;
+    height: 28px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.18), transparent);
+    pointer-events: none;
+  }
+  .features-header-inner { max-width: 1080px; margin: 0 auto; padding: 0 52px; }
+  .features-header-inner .eyebrow { color: var(--lime); }
+  .features-header-inner h2 { color: var(--bg); margin: 0; }
+  .dual-media { display: flex; gap: 16px; justify-content: center; }
+  .screen-frame, .dual-frame {
+    background: var(--bg);
+    border-radius: 28px;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.45);
+    margin: 0 auto;
+  }
+  .screen-frame { padding: 6px; max-width: 250px; }
+  .dual-frame { padding: 4px; max-width: 230px; border-radius: 22px; box-shadow: 0 16px 32px rgba(0,0,0,0.4); }
+  .dual-media video, .dual-media img { width: 100%; height: auto; aspect-ratio: 9/19.5; object-fit: cover; border-radius: 14px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+  .feature-row .asset-slot { min-height: 300px; }
+  .feature-row video, .feature-row .mockup-img { width: 100%; height: auto; aspect-ratio: 9/19.5; object-fit: cover; border-radius: 20px; display: block; box-shadow: 0 6px 14px rgba(0,0,0,0.22); }
+
+  .feature-row .tag { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--navy); background: #E4EBF1; padding: 4px 10px; border-radius: 20px; margin-bottom: 14px; }
+  .feature-row h3 { font-size: 36px; font-family: 'Archivo Black', sans-serif; color: var(--bg); margin-bottom: 20px; line-height: 1.15; }
+  .feature-row.accent-lime { border-top: 4px solid var(--lime); }
+  .feature-row.accent-sky { border-top: 4px solid var(--sky); }
+  .feature-row.accent-blue { border-top: 4px solid var(--blue); }
+  .feature-row .fp { margin-bottom: 16px; font-size: 17px; line-height: 1.55; color: #C9D6E3; }
+  .feature-row .fp b { color: var(--lime); }
+
+  /* DESIGN DECISIONS */
+  .decisions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .decision-card { background: #EFEAE0; border-radius: 6px; padding: 24px; border-left: 3px solid var(--blue); }
+  .decision-card h3 { font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .decision-card p { font-size: 14px; margin-bottom: 0; color: #444; }
+
+  /* CHALLENGES */
+  .challenges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .challenge-card { border-left: 3px solid var(--lime); padding-left: 16px; }
+  .challenge-card h3 { font-size: 14px; font-family: 'Inter', sans-serif; font-weight: 700; margin-bottom: 8px; color: var(--ink); }
+  .challenge-card p { font-size: 13px; color: #444; }
+
+  /* REFLECTION */
+  .reflection-block { max-width: 780px; }
+  .reflection-block h3 { font-size: 14px; color: var(--blue); text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.05em; margin: 32px 0 10px 0; }
+  .reflection-block h3:first-child { margin-top: 0; }
+  .reflection-block p { font-size: 17px; }
+
+  /* CTA */
+  .cta { background: var(--navy); color: var(--bg); text-align: center; padding: 90px 0; }
+  .cta h2 { color: var(--bg); font-size: 34px; max-width: 640px; margin: 0 auto 12px auto; }
+  .cta-subhead { color: var(--bg); font-size: 18px; font-weight: 500; margin: 0 auto 32px auto; opacity: 0.85; }
+  .cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .cta-primary { display: inline-block; background: var(--sky); color: var(--bg); font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 14px; text-decoration: none; padding: 14px 32px; border-radius: 4px; letter-spacing: 0.03em; }
+
+  @media (max-width: 800px) {
+    .overview-grid, .research-grid, .feature-row-inner, .decisions-grid, .challenges-grid,
+    .phase-block .content-row, .hero-inner { grid-template-columns: minmax(0, 1fr); }
+    .feature-row.reverse .feature-row-inner { direction: ltr; }
+    .hero h1 { font-size: 40px; }
+    .hero-visual { margin-top: 40px; }
+    .hero-devices { justify-content: center; }
+    .device-frame.lg { width: 150px; height: 308px; }
+    .device-frame.md { width: 118px; height: 242px; margin-bottom: 28px; }
+    .device-frame.sm { width: 98px; height: 201px; margin-bottom: 46px; }
+    .discovery-collage { position: static; max-width: 100%; justify-content: center; margin-top: 24px; }
+    .feature-row { min-height: 0; position: static; border-radius: 20px; margin-bottom: 20px; }
+    .feature-row-inner { padding: 40px 28px; }
+  }
+</style>
+</head>
+<body>
+
+  <section class="hero stack pin">
+    <div class="wrap hero-inner">
+      <div class="hero-text">
+        <div class="eyebrow-top">Case Study — Product Design &amp; Development</div>
+        <h1>VANTAGE<br>TENNIS</h1>
+        <p class="subhead">Turning a coach's scattered workflow into a scalable coaching platform.</p>
+        <div class="scoreboard">
+          <div class="cell"><div class="label">Role</div><div class="value">Solo Designer + Builder</div></div>
+          <div class="cell"><div class="label">Timeline</div><div class="value">3&ndash;4 Months</div></div>
+          <div class="cell"><div class="label">Platform</div><div class="value">iOS &amp; Android</div></div>
+          <div class="cell"><div class="label">Built With</div><div class="value">FlutterFlow, Firebase, RevenueCat</div></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-glow"></div>
+        <div class="hero-devices">
+          <div class="device-frame sm">
+            <div class="device-float">
+              <img src="assets/images/highlight-video-analysis.png" alt="Forehand video analysis screen with coach's note">
+            </div>
+          </div>
+          <div class="device-frame lg">
+            <div class="device-float">
+              <img src="assets/images/highlight-video-feed.png" alt="Scrollable training video library feed">
+            </div>
+          </div>
+          <div class="device-frame md">
+            <div class="device-float">
+              <img src="assets/images/highlight-messaging.png" alt="Direct messaging thread with a coach">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stack pin sec-overview">
+    <div class="wrap">
+      <h2><span class="eyebrow">01 &mdash; Overview</span>What Vantage Tennis Is</h2>
+      <div class="overview-grid">
+        <div>
+          <p>Vantage Tennis started as a favor for my former competitive tennis coach: her best coaching moments were getting lost across Instagram DMs, email threads, and YouTube comments. <b>I built her a single subscription platform where players get premium training content, message her directly, and submit video for personalized analysis.</b></p>
+          <p>I designed and built the entire product solo: <b>research, UX/UI, FlutterFlow development, Firebase backend, subscription payments, and launch on both app stores.</b></p>
+        </div>
+        <div class="overview-video">
+          <div class="overview-glow"></div>
+          <video src="assets/videos/overview-video.mp4" poster="assets/images/overview-poster.jpg" muted playsinline preload="metadata"></video>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS: Design Thinking -->
+  <section class="stack pass sec-process">
+    <div class="wrap">
+      <h2><span class="eyebrow">02 &mdash; Process</span>From Research to Launch</h2>
+      <p style="max-width:700px;">Here's how the project actually came together, six stages from early research through a live launch on both app stores.</p>
+
+      <div class="phase-block">
+        <div class="phase-head"><span class="phase-num">01</span><span class="phase-name">Discovery</span></div>
+        <div class="content-row">
+          <div>
+            <h4>Coach Interviews</h4>
+            <p>I ran a series of conversations with my coach to understand her current process end to end. Three things came out of these conversations that shaped the entire product:</p>
+            <div class="finding-label">Key Discoveries</div>
+            <div class="finding-cards">
+              <div class="finding-card"><span class="fnum">01</span><p>Her coaching content already had real premium-level demand, but it wasn't packaged to capture it.</p></div>
+              <div class="finding-card"><span class="fnum">02</span><p>Player questions and requests were scattered across so many different channels that things got overlooked.</p></div>
+              <div class="finding-card"><span class="fnum">03</span><p>Requesting and submitting video for analysis was scattered across tools, and consolidating it into one flow opened the door to ongoing feedback, not just one-off reviews.</p></div>
+            </div>
+            <h4>Competitive Analysis</h4>
+            <p>I studied Intuitive Tennis, an existing paywalled coaching app, examining its user flows and usability to see where I could differentiate, particularly around direct coach access and structured video feedback.</p>
+            <h4>My Own Domain Expertise</h4>
+            <p>I've competed since age nine, and brought that firsthand experience of working with a remote coach directly into the design process.</p>
+          </div>
+          <div class="discovery-collage">
+            <div class="collage-item note c-b">
+              <p>one app for ALL my tennis learning</p>
+            </div>
+            <div class="collage-item note c-d">
+              <p>new premium content, every week</p>
+            </div>
+            <div class="collage-item note c-e">
+              <p>gotta condense this workflow</p>
+            </div>
+            <figure class="collage-item screenshot c-c">
+              <img src="assets/images/discovery-intuitive-tennis-reference.jpg" alt="Intuitive Tennis app, competitive reference" />
+              <figcaption>Intuitive Tennis &mdash; competitive analysis</figcaption>
+            </figure>
+            <figure class="collage-item polaroid c-a">
+              <img src="assets/images/discovery-penn-state.jpg" alt="Serving during a competitive match at Penn State" />
+              <figcaption>15+ years on court</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-block">
+        <div class="phase-head"><span class="phase-num">02</span><span class="phase-name">Problem Definition</span></div>
+        <div>
+          <p style="max-width:700px;">My coach didn't have a product problem so much as a business problem hiding in plain sight. She had real expertise and a growing base of players who wanted access to it, but no way to deliver that expertise at scale.</p>
+          <p style="max-width:700px; margin-top:24px;">Coming out of research, three goals defined what the product needed to do:</p>
+          <div class="goals-band">
+            <div class="goal-cell">
+              <span class="gnum">GOAL 01</span>
+              <h4>Global Connection</h4>
+              <p>Connect players anywhere in the world with Vantage Tennis coaches, so they can get personalized tips and guidance no matter their location.</p>
+            </div>
+            <div class="goal-cell">
+              <span class="gnum">GOAL 02</span>
+              <h4>Structured Feedback</h4>
+              <p>Create a structured way for players to submit video and receive personalized feedback.</p>
+            </div>
+            <div class="goal-cell">
+              <span class="gnum">GOAL 03</span>
+              <h4>One Platform</h4>
+              <p>Consolidate the coach's workflow, content, messaging, and analysis, into a single platform.</p>
+            </div>
+          </div>
+          <div class="pull-quote" style="margin-top:28px;"><span class="hmw-tag">How might we</span>Help a coach deliver personalized, premium coaching to players anywhere in the world, at any hour and on any device, without losing the one-on-one connection and trust that makes in-person coaching valuable in the first place?</div>
+        </div>
+      </div>
+
+      <div class="phase-block">
+        <div class="phase-head"><span class="phase-num">03</span><span class="phase-name">Concept Exploration</span></div>
+        <div>
+          <p style="max-width:700px;">Before opening Figma, I sketched every core screen by hand, working through layout options for the video feed, messaging, and the video analysis flow. Early passes explored a few different approaches: a single scrolling feed versus a categorized one, a lock-icon treatment for gated content versus hiding it outright, and where video analysis submission and status tracking should live in the navigation. Sketching it out first let me test the full navigation structure end to end before committing anything to high-fidelity design.</p>
+          <div class="sketch-gallery">
+            <figure>
+              <img src="assets/images/concept-hand-sketches.jpg" alt="Early hand-drawn sketches of the video feed, messages, video analysis form, and profile screens" />
+              <figcaption>Early sketches: video feed, messages, video analysis, and profile</figcaption>
+            </figure>
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-block">
+        <div class="phase-head"><span class="phase-num">04</span><span class="phase-name">Design &amp; Build</span></div>
+
+        <div>
+          <h4 class="dev-subhead">Brand Identity</h4>
+          <div style="max-width:700px;">
+            <p>Before opening Figma, I pulled together a small brand foundation from what the coach already had: her existing logo and a five-color palette taken directly from her website and social presence.</p>
+            <p style="margin-top:16px;">Rather than inventing a new visual identity from scratch, the goal was for the app to feel like an obvious extension of a business her players already knew and trusted. These same five colors carried through into every screen of the app, and into this case study itself.</p>
+            <div class="brand-chip">
+              <img class="brand-chip-logo" src="assets/images/brand-logo.png" alt="Vantage Tennis logo">
+              <div class="brand-chip-dots">
+                <span class="dot" style="background:#001D3D"></span>
+                <span class="dot" style="background:#003566"></span>
+                <span class="dot" style="background:#055EC2"></span>
+                <span class="dot" style="background:#007AFF"></span>
+                <span class="dot" style="background:#A4FF0E"></span>
+              </div>
+            </div>
+          </div>
+
+          <h4 class="dev-subhead" style="margin-top:32px;">UX/UI Design</h4>
+
+          <h4 style="margin-top:0;">User Flows</h4>
+          <p style="max-width:700px; margin-bottom:8px;">Mapping the full journey, not just the screens. I traced each core flow end-to-end, catching edge cases and error states before writing a line of code. Click any diagram to open it fullscreen.</p>
+
+          <div class="flow-list">
+            <div class="flow-card">
+              <div class="flow-label">1. New User Onboarding</div>
+              <div class="flow-scroll">
+                <img class="flow-expand" src="assets/images/flow-onboarding.png" alt="New user onboarding flow diagram" data-src="assets/images/flow-onboarding.png" data-alt="New user onboarding flow diagram" style="height:226px;">
+              </div>
+            </div>
+            <div class="flow-card">
+              <div class="flow-label">2. Video Analysis Submission</div>
+              <div class="flow-scroll">
+                <img class="flow-expand" src="assets/images/flow-video-analysis.png" alt="Video analysis submission flow diagram" data-src="assets/images/flow-video-analysis.png" data-alt="Video analysis submission flow diagram" style="height:353px;">
+              </div>
+            </div>
+            <div class="flow-card">
+              <div class="flow-label">3. Paywall &amp; Premium Upgrade</div>
+              <div class="flow-scroll">
+                <img class="flow-expand" src="assets/images/flow-paywall.png" alt="Paywall and premium upgrade flow diagram" data-src="assets/images/flow-paywall.png" data-alt="Paywall and premium upgrade flow diagram">
+              </div>
+            </div>
+          </div>
+
+          <h4 style="margin-top:36px;">Sketches to Figma Wireframes</h4>
+          <p style="max-width:700px;">Every core screen started as a hand sketch before I opened Figma. Sketching first let me work through layout and navigation quickly, without getting attached to any particular visual treatment too early. This is genuinely my favorite part of building products: watching a rough sketch turn into something real. Scroll to this section and each sketch will fade into its finished Figma design.</p>
+          <div class="sketch-to-figma-grid">
+              <div class="stf-card">
+                <div class="frame">
+                  <img class="figma" src="assets/images/figma-video-feed.png" alt="Finished Figma design of the video feed">
+                  <img class="sketch" src="assets/images/sketch-video-feed.png" alt="Hand sketch of the video feed">
+                </div>
+                <span class="stf-label">Video Feed</span>
+              </div>
+              <div class="stf-card">
+                <div class="frame">
+                  <img class="figma" src="assets/images/figma-messages.png" alt="Finished Figma design of messaging">
+                  <img class="sketch" src="assets/images/sketch-messages.png" alt="Hand sketch of messaging">
+                </div>
+                <span class="stf-label">Messages</span>
+              </div>
+              <div class="stf-card">
+                <div class="frame">
+                  <img class="figma" src="assets/images/figma-video-player.png" alt="Finished Figma design of the video player">
+                  <img class="sketch" src="assets/images/sketch-video-player.png" alt="Hand sketch of the video player">
+                </div>
+                <span class="stf-label">Video Player</span>
+              </div>
+              <div class="stf-card">
+                <div class="frame">
+                  <img class="figma" src="assets/images/figma-profile.png" alt="Finished Figma design of the profile screen">
+                  <img class="sketch" src="assets/images/sketch-profile.png" alt="Hand sketch of the profile screen">
+                </div>
+                <span class="stf-label">Profile</span>
+              </div>
+              <div class="stf-card">
+                <div class="frame">
+                  <img class="figma" src="assets/images/figma-video-analysis.png" alt="Finished Figma design of video analysis submission">
+                  <img class="sketch" src="assets/images/sketch-video-analysis-form.png" alt="Hand sketch of video analysis submission">
+                </div>
+                <span class="stf-label">Video Analysis</span>
+              </div>
+          </div>
+
+          <h4 class="dev-subhead" style="margin-top:32px;">Backend &amp; Development</h4>
+          <p style="max-width:700px;">With the designs finalized, I built the entire product myself, integrating three core technologies that worked together to power the full experience for both players and coaches.</p>
+
+          <div class="tech-grid">
+            <div class="tech-card">
+              <img src="assets/images/logo-flutterflow.png" alt="FlutterFlow logo" class="tech-logo">
+              <div class="tech-role">Built the Experience</div>
+              <div class="tech-name">FlutterFlow</div>
+              <p>Developed the application's interface, navigation, and interactive features across iOS and Android.</p>
+            </div>
+            <div class="tech-card">
+              <img src="assets/images/logo-firebase.png" alt="Firebase logo" class="tech-logo">
+              <div class="tech-role">Powered the Data</div>
+              <div class="tech-name">Firebase</div>
+              <p>Managed authentication, cloud data, messaging, and application state throughout the app.</p>
+            </div>
+            <div class="tech-card">
+              <img src="assets/images/logo-revenuecat.png" alt="RevenueCat logo" class="tech-logo">
+              <div class="tech-role">Enabled the Business Model</div>
+              <div class="tech-name">RevenueCat</div>
+              <p>Managed subscriptions and unlocked premium access across the Apple App Store and Google Play.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-block">
+        <div class="phase-head"><span class="phase-num">05</span><span class="phase-name">Testing / Validation</span></div>
+        <p style="max-width:700px;">Before releasing publicly, I tested the app thoroughly using Apple TestFlight for iOS and Google Play testing for Android. In hindsight, this is the one place I'd change my process: testing earlier would have caught issues before they were built into the foundation (more in Challenges &amp; Reflection).</p>
+
+        <h4 class="dev-subhead" style="margin-top:28px;">What I Validated</h4>
+        <div class="tech-grid">
+          <div class="tech-card">
+            <div class="tech-role">User Experience</div>
+            <p>Tested whether players could easily navigate the app, access training content, and understand the available features.</p>
+          </div>
+          <div class="tech-card">
+            <div class="tech-role">Core Functionality</div>
+            <p>Verified authentication, RevenueCat subscription payments, messaging, and video analysis submission all worked correctly.</p>
+          </div>
+          <div class="tech-card">
+            <div class="tech-role">Platform Readiness</div>
+            <p>Tested app performance and functionality across iOS and Android before submitting for public release.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-block">
+        <div class="phase-head"><span class="phase-num">06</span><span class="phase-name">Launch</span></div>
+        <div class="content-row" style="align-items:center;">
+          <div>
+            <p>I implemented the subscription tiers Vantage Tennis provided and submitted the app to both the App Store and Google Play. After a more iterative submission process than expected, <b>Vantage Tennis officially launched on both platforms!</b></p>
+          </div>
+          <img src="assets/images/launch-google-play.png" alt="Vantage Tennis live on the Google Play Store" style="width:100%;border-radius:8px;border:1px solid var(--line);box-shadow:0 12px 24px rgba(0,29,61,0.12);display:block;">
+        </div>
+      </div>
+
+    </div>
+  </section>
+  <!-- KEY FEATURES -->
+  <section class="stack pass sec-features">
+    <div class="features-sticky-header">
+      <div class="features-header-inner">
+        <span class="eyebrow">03 &mdash; Key Features</span>
+        <h2>App Features</h2>
+      </div>
+    </div>
+
+      <div class="feature-row f-ink">
+        <div class="feature-row-inner">
+          <div class="screen-frame">
+            <video class="mockup-img" src="assets/videos/feature-01-video-feed.mp4" autoplay loop muted playsinline></video>
+          </div>
+          <div>
+            <span class="tag">Feature 01</span>
+            <h3>Premium Video Content Feed</h3>
+            <p class="fp"><b>Problem:</b> Her best content sat on YouTube for free, capturing none of its value.</p>
+            <p class="fp"><b>Solution:</b> A tiered feed, three free sample videos, full library for subscribers.</p>
+            <p class="fp"><b>Why it matters:</b> Turned her content library into an actual revenue stream while still proving quality upfront.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-row reverse f-navy">
+        <div class="feature-row-inner">
+          <div class="screen-frame">
+            <video class="mockup-img" src="assets/videos/feature-02-messaging.mp4" autoplay loop muted playsinline></video>
+          </div>
+          <div>
+            <span class="tag">Feature 02</span>
+            <h3>Direct Coach Messaging</h3>
+            <p class="fp"><b>Problem:</b> Player questions were scattered across DMs, comments, and email.</p>
+            <p class="fp"><b>Solution:</b> An in-app messaging system for Basic and Premium subscribers.</p>
+            <p class="fp"><b>Why it matters:</b> One inbox for the coach, one clear place for players to ask.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-row f-blue">
+        <div class="feature-row-inner">
+          <div class="screen-frame">
+            <video class="mockup-img" src="assets/videos/feature-03-video-analysis.mp4" autoplay loop muted playsinline></video>
+          </div>
+          <div>
+            <span class="tag">Feature 03</span>
+            <h3>Video Analysis Submission</h3>
+            <p class="fp"><b>Problem:</b> The most valuable offering ran through email, where submissions got lost.</p>
+            <p class="fp"><b>Solution:</b> A dedicated flow to upload, track status, and receive tailored feedback.</p>
+            <p class="fp"><b>Why it matters:</b> Turned an informal favor into a structured, visible product offering.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-row reverse f-sky">
+        <div class="feature-row-inner">
+          <div class="dual-media">
+            <div class="dual-frame">
+              <img src="assets/images/other-saved-videos.png" alt="Saved videos list showing bookmarked training content">
+            </div>
+            <div class="dual-frame">
+              <img src="assets/images/other-profile.png" alt="Profile screen with account and subscription management">
+            </div>
+          </div>
+          <div>
+            <h3>Saved Videos &amp; Profile</h3>
+            <p class="fp"><b>Saved Videos:</b> bookmark training content to revisit anytime.</p>
+            <p class="fp"><b>Profile:</b> manage account, subscription, and settings in one place.</p>
+          </div>
+        </div>
+      </div>
+
+  </section>
+  <!-- CHALLENGES -->
+  <section class="tight stack pin sec-challenges">
+    <div class="wrap">
+      <h2><span class="eyebrow">04 &mdash; Challenges</span>What Actually Got in the Way</h2>
+      <div class="challenges-grid">
+        <div class="challenge-card">
+          <h3>Video Upload Performance</h3>
+          <p>Larger uploads on the coach's end were slow, sometimes failing outright.</p>
+        </div>
+        <div class="challenge-card">
+          <h3>Store Review Cycles</h3>
+          <p>Approval took several resubmission rounds, the most unpredictable part of the timeline.</p>
+        </div>
+        <div class="challenge-card">
+          <h3>FlutterFlow's Limits</h3>
+          <p>A low-code platform meant working around constraints a custom codebase wouldn't have.</p>
+        </div>
+        <div class="challenge-card">
+          <h3>Scope &amp; Time</h3>
+          <p>Every role, design to deployment, fell on one person, so I prioritized ruthlessly and leaned into the skills that mattered most for getting it live.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REFLECTION -->
+  <section class="stack pin sec-reflection">
+    <div class="wrap">
+      <h2><span class="eyebrow">05 &mdash; Reflection</span>Looking Back</h2>
+      <div class="reflection-block">
+        <h3>What Worked</h3>
+        <p>Every planned feature functional end to end, from login through payments to coach-side review, as a single builder.</p>
+        <h3>What I'd Improve</h3>
+        <p>Tighter stakeholder communication throughout the build, more upfront research into store submission requirements, and usability testing brought in earlier, before the product was fully built.</p>
+        <h3>What I Learned</h3>
+        <p>This project ran the full lifecycle of a real product: idea to requirements, requirements to design, design to a working front end and backend, and a working app to two live store listings with real payments running through it. Designing a feature is one thing. Being responsible for whether it works, ships, and gets paid for is another.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta stack pin">
+    <div class="wrap">
+      <h2>Built to Ship, Not Just to Show</h2>
+      <p class="cta-subhead">Let's make something cool.</p>
+      <div class="cta-actions">
+        <a class="cta-primary" href="mailto:contact@daniellealamo.com">Get In Touch</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="flow-lightbox" id="flow-lightbox">
+    <button class="flow-lightbox-close" id="flow-lightbox-close" aria-label="Close">&times;</button>
+    <div class="flow-lightbox-scroll">
+      <img id="flow-lightbox-img" src="" alt="Expanded flow diagram">
+    </div>
+  </div>
+
+  <script>
+    // Overview video: stays static (poster) until scrolled into view, then
+    // plays; pauses (not resets) as soon as it's scrolled back out -- keeps
+    // it purely a scroll-triggered animation beat rather than a constant
+    // background loop, for both intent and page performance.
+    (function () {
+      var vid = document.querySelector('.overview-video video');
+      if (!vid) return;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            vid.play().catch(function () {});
+          } else {
+            vid.pause();
+          }
+        });
+      }, { threshold: 0.5 });
+      io.observe(vid);
+    })();
+
+    // Sketch -> Figma cards: once the grid scrolls into view, each screen
+    // starts a slow, continuous loop cross-fading between the hand sketch
+    // and the finished Figma design.
+    (function () {
+      var grid = document.querySelector('.sketch-to-figma-grid');
+      if (!grid) return;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            grid.querySelectorAll('.frame').forEach(function (frame) {
+              frame.classList.add('looping');
+            });
+            io.unobserve(grid);
+          }
+        });
+      }, { threshold: 0.4 });
+      io.observe(grid);
+    })();
+
+    // Flow diagrams: click to open in a fullscreen lightbox
+    (function () {
+      var lightbox = document.getElementById('flow-lightbox');
+      var lightboxImg = document.getElementById('flow-lightbox-img');
+      document.querySelectorAll('.flow-expand').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          lightboxImg.src = btn.dataset.src;
+          lightboxImg.alt = btn.dataset.alt || '';
+          lightbox.classList.add('active');
+        });
+      });
+      document.getElementById('flow-lightbox-close').addEventListener('click', function () {
+        lightbox.classList.remove('active');
+      });
+      lightbox.addEventListener('click', function (e) {
+        if (e.target === lightbox) lightbox.classList.remove('active');
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') lightbox.classList.remove('active');
+      });
+    })();
+  </script>
+
+</body>
+</html>

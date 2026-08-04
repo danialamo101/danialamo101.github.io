@@ -64,6 +64,32 @@
   .cta.stack { z-index: 8; background: var(--navy); }
 
   /* HERO */
+  .site-nav {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    background: var(--ink);
+    border-bottom: 1px solid rgba(247,244,238,0.12);
+  }
+  .site-nav a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bg);
+    text-decoration: none;
+    opacity: 0.85;
+    transition: opacity 0.2s ease, color 0.2s ease;
+  }
+  .site-nav a:hover { opacity: 1; color: var(--lime); }
+  .site-nav-links { display: flex; align-items: center; gap: 24px; }
+  @media (max-width: 500px) {
+    .site-nav { padding: 14px 20px; }
+    .site-nav a { font-size: 10px; }
+  }
+
   .hero { background: var(--ink); color: var(--bg); padding: 90px 0 0 0; overflow: hidden; }
   .hero-inner { padding-bottom: 56px; }
   .hero .eyebrow-top {
@@ -603,6 +629,49 @@
   .cta h2 { color: var(--bg); font-size: 34px; max-width: 640px; margin: 0 auto 12px auto; }
   .cta-subhead { color: var(--bg); font-size: 18px; font-weight: 500; margin: 0 auto 32px auto; opacity: 0.85; }
   .cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  .site-footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 24px;
+    text-align: left;
+    margin-top: 56px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    border-top: 1px solid rgba(247,244,238,0.15);
+  }
+  .site-footer-name { font-family: 'Archivo Black', sans-serif; font-size: 18px; color: var(--bg); }
+  .site-footer-location {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #AFC3D6;
+    margin: 6px 0 0 0;
+  }
+  .site-footer-links { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .site-footer-links a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--bg);
+    text-decoration: none;
+    opacity: 0.85;
+    transition: opacity 0.2s ease, color 0.2s ease;
+  }
+  .site-footer-links a:hover { opacity: 1; color: var(--lime); }
+  .site-footer-bottom {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: #7C8CA0;
+    padding-top: 20px;
+    text-align: center;
+  }
+  @media (max-width: 500px) {
+    .site-footer-inner { flex-direction: column; }
+    .site-footer-links { align-items: flex-start; }
+  }
   .cta-primary { display: inline-block; background: var(--sky); color: var(--bg); font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 14px; text-decoration: none; padding: 14px 32px; border-radius: 4px; letter-spacing: 0.03em; }
 
   @media (max-width: 800px) {
@@ -634,6 +703,14 @@
 </style>
 </head>
 <body>
+
+  <div class="site-nav">
+    <a href="https://daniellealamo.com" class="site-nav-home">&larr; Danielle Alamo</a>
+    <div class="site-nav-links">
+      <a href="https://drive.google.com/file/d/1zvWz1_og09kt3Dyami9q3p-w3bOyS6ir/view?usp=drive_link" target="_blank" rel="noopener">Resume</a>
+      <a href="https://daniellealamo.com/contact">Contact</a>
+    </div>
+  </div>
 
   <section class="hero stack pin">
     <div class="wrap hero-inner">
@@ -1030,13 +1107,25 @@
     </div>
   </section>
 
-  <section class="cta stack pin">
+  <section class="cta stack">
     <div class="wrap">
       <h2>Built to Ship, Not Just to Show</h2>
       <p class="cta-subhead">Let's make something cool.</p>
       <div class="cta-actions">
         <a class="cta-primary" href="mailto:contact@daniellealamo.com">Get In Touch</a>
       </div>
+      <div class="site-footer-inner">
+        <div>
+          <div class="site-footer-name">Danielle Alamo</div>
+          <p class="site-footer-location">Miami, FL, USA</p>
+        </div>
+        <div class="site-footer-links">
+          <a href="https://daniellealamo.com">Portfolio</a>
+          <a href="mailto:contact@daniellealamo.com">contact@daniellealamo.com</a>
+          <a href="https://www.linkedin.com/in/daniellealamo" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+      <div class="site-footer-bottom">&copy; 2026 Danielle Alamo</div>
     </div>
   </section>
 
